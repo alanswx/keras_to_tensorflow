@@ -7,7 +7,7 @@ from keras import backend as K
 from keras.models import load_model
 #from tensorflow_serving.session_bundle import exporter
 from keras.models import model_from_config
-from keras.models import Sequential
+from keras.models import Sequential,Model
 import tensorflow as tf
 import os
 
@@ -31,7 +31,10 @@ def convert(prevmodel,export_path,freeze_graph_binary):
    weights = previous_model.get_weights()
 
    # re-build a model where the learning phase is now hard-coded to 0
-   model= Sequential.from_config(config) 
+   try:
+     model= Sequential.from_config(config) 
+   except:
+     model= Model.from_config(config) 
    #model= model_from_config(config)
    model.set_weights(weights)
 
