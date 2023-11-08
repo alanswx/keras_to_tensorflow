@@ -3,19 +3,20 @@
 #
 
 import argparse
-from keras import backend as K
+from tensorflow.python.keras import backend as K
 from keras.models import load_model
 #from tensorflow_serving.session_bundle import exporter
 from keras.models import model_from_config
 from keras.models import Sequential,Model
 import tensorflow as tf
 import os
-
+# Disable the eager execution mode
+tf.compat.v1.disable_eager_execution()
 
 def convert(prevmodel,export_path,freeze_graph_binary):
 
    # open up a Tensorflow session
-   sess = tf.Session()
+   sess = tf.compat.v1.Session()
    # tell Keras to use the session
    K.set_session(sess)
 
@@ -50,8 +51,8 @@ def convert(prevmodel,export_path,freeze_graph_binary):
    graph_file=export_path+"_graph.pb"
    ckpt_file=export_path+".ckpt"
    # create a saver 
-   saver = tf.train.Saver(sharded=True)
-   tf.train.write_graph(sess.graph_def, '', graph_file)
+   saver = tf.compat.v1.train.Saver(sharded=True)
+   tf.io.write_graph(sess.graph_def, '', graph_file)
    save_path = saver.save(sess, ckpt_file)
 #~/tensorflow/bazel-bin/tensorflow/python/tools/freeze_graph --input_graph=./graph.pb  --input_checkpoint=./model.ckpt --output_node_names=add_72 --output_graph=frozen.pb
    command = freeze_graph_binary +" --input_graph=./"+graph_file+" --input_checkpoint=./"+ckpt_file+" --output_node_names="+output_name+" --output_graph=./"+export_path+".pb"
